@@ -36,9 +36,8 @@ sealed trait Tree {
   }
 
   def fold[A](a: A)(f: (A, Int) => A): A = this match {
-    case Branch(e, l, r) => {
+    case Branch(e, l, r) =>
       r.fold(f(l.fold(a)(f), e))(f)
-    }
     case Node(e) => f(a, e)
     case Empty => a
   }
@@ -50,11 +49,10 @@ sealed trait Tree {
    * @param f
    */
   def in_order(f: Int => Unit): Unit = this match {
-    case Branch(e, l, r) => {
+    case Branch(e, l, r) =>
       l.in_order(f)
       f(e)
       r.in_order(f)
-    }
     case Node(e) => f(e)
     case Empty => // do nothing
   }
@@ -64,11 +62,10 @@ sealed trait Tree {
    * @return
    */
   def pre_order(f: Int => Unit): Unit = this match {
-    case Branch(e, l, r) => {
+    case Branch(e, l, r) =>
       f(e)
       l.pre_order(f)
       r.pre_order(f)
-    }
     case Node(e) => f(e)
     case Empty =>
   }
@@ -78,11 +75,10 @@ sealed trait Tree {
    * @return
    */
   def post_order(f: Int => Unit): Unit = this match {
-    case Branch(e, l, r) => {
+    case Branch(e, l, r) =>
       l.post_order(f)
       r.post_order(f)
       f(e)
-    }
     case Node(e) => f(e)
     case Empty =>
   }
@@ -145,14 +141,13 @@ sealed trait Tree {
             case (false, _, _) => (Branch(e, avl_lt, r), false)
             case (true, RightHigher, _) => (Branch(e, avl_lt, r), false)
             case (true, Balanced, _) => (Branch(e, avl_lt, r), increased)
-            case (true, LeftHigher, LeftHigher) => {
+            case (true, LeftHigher, LeftHigher) =>
               (Branch(
                 avl_lt._element.get,
                 avl_lt._left,
                 Branch(e, avl_lt._right, r)
               ), false)
-            }
-            case (true, LeftHigher, RightHigher) => {
+            case (true, LeftHigher, RightHigher) =>
               // AVL平衡した左部分木の右部分木
               val lr_tree = avl_lt._right
               val (lr_e, lr_l, lr_r) =
@@ -160,7 +155,6 @@ sealed trait Tree {
               (Branch(lr_e.get,
                 Branch(avl_lt._element.get, avl_lt._left, lr_l),
                 Branch(e, lr_r, r)), false)
-            }
             case (true, LeftHigher, Balanced) =>
               (Branch(e, avl_lt, r), false)
           }
@@ -171,14 +165,13 @@ sealed trait Tree {
             case (false, _, _) => (Branch(e, l, avl_rt), false)
             case (true, LeftHigher, _) => (Branch(e, l, avl_rt), false)
             case (true, Balanced, _) => (Branch(e, l, avl_rt), increased)
-            case (true, RightHigher, RightHigher) => {
+            case (true, RightHigher, RightHigher) =>
               val (r_e, r_l, r_r) =
                 (avl_rt._element, avl_rt._left, avl_rt._right)
               (Branch(r_e.get,
                 Branch(e, l, r_l),
                 r_r), false)
-            }
-            case (true, RightHigher, LeftHigher) => {
+            case (true, RightHigher, LeftHigher) =>
               val r_l = avl_rt._left
               // AVL平衡した右部分木の左部分木
               val (rl_e, rl_l, rl_r) =
@@ -187,7 +180,6 @@ sealed trait Tree {
                 Branch(e, l, rl_l),
                 Branch(avl_rt._element.get, rl_r, avl_rt._right)),
                 false)
-            }
             case (true, RightHigher, Balanced) =>
               (Branch(e, l, avl_rt), false)
           }
