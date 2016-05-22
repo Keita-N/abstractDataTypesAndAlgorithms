@@ -141,59 +141,55 @@ sealed trait Tree {
         else if (elem < e) {
           // 左部分木に挿入
           val (avl_lt, increased) = _avl_insert_(l)(elem)
-          if (increased) {
-            (tree.balance, avl_lt.balance) match {
-              case (RightHigher, _) => (Branch(e, avl_lt, r), false)
-              case (Balanced, _) => (Branch(e, avl_lt, r), increased)
-              case (LeftHigher, LeftHigher) => {
-                (Branch(
-                  avl_lt._element.get,
-                  avl_lt._left,
-                  Branch(e, avl_lt._right, r)
-                ), false)
-              }
-              case (LeftHigher, RightHigher) => {
-                // AVL平衡した左部分木の右部分木
-                val lr_tree = avl_lt._right
-                val (lr_e, lr_l, lr_r) =
-                  (lr_tree._element, lr_tree._left, lr_tree._right)
-                (Branch(lr_e.get,
-                  Branch(avl_lt._element.get, avl_lt._left, lr_l),
-                  Branch(e, lr_r, r)), false)
-              }
-              case (LeftHigher, Balanced) =>(Branch(e, avl_lt, r), false)
+          (increased, tree.balance, avl_lt.balance) match {
+            case (false, _, _) => (Branch(e, avl_lt, r), false)
+            case (true, RightHigher, _) => (Branch(e, avl_lt, r), false)
+            case (true, Balanced, _) => (Branch(e, avl_lt, r), increased)
+            case (true, LeftHigher, LeftHigher) => {
+              (Branch(
+                avl_lt._element.get,
+                avl_lt._left,
+                Branch(e, avl_lt._right, r)
+              ), false)
             }
-          } else {
-            (Branch(e, avl_lt, r), false)
+            case (true, LeftHigher, RightHigher) => {
+              // AVL平衡した左部分木の右部分木
+              val lr_tree = avl_lt._right
+              val (lr_e, lr_l, lr_r) =
+                (lr_tree._element, lr_tree._left, lr_tree._right)
+              (Branch(lr_e.get,
+                Branch(avl_lt._element.get, avl_lt._left, lr_l),
+                Branch(e, lr_r, r)), false)
+            }
+            case (true, LeftHigher, Balanced) =>
+              (Branch(e, avl_lt, r), false)
           }
         } else {
           // 右部分木に挿入
           val (avl_rt, increased) = _avl_insert_(r)(elem)
-          if (increased) {
-            (tree.balance, avl_rt.balance) match {
-              case (LeftHigher, _) => (Branch(e, l, avl_rt), false)
-              case (Balanced, _) => (Branch(e, l, avl_rt), increased)
-              case (RightHigher, RightHigher) => {
-                val (r_e, r_l, r_r) =
-                  (avl_rt._element, avl_rt._left, avl_rt._right)
-                (Branch(r_e.get,
-                  Branch(e, l, r_l),
-                  r_r), false)
-              }
-              case (RightHigher, LeftHigher) => {
-                val r_l = avl_rt._left
-                // AVL平衡した右部分木の左部分木
-                val (rl_e, rl_l, rl_r) =
-                  (r_l._element, r_l._left, r_l._right)
-                (Branch(rl_e.get,
-                  Branch(e, l, rl_l),
-                  Branch(avl_rt._element.get, rl_r, avl_rt._right)),
-                  false)
-              }
-              case (RightHigher, Balanced) => (Branch(e, l, avl_rt), false)
+          (increased, tree.balance, avl_rt.balance) match {
+            case (false, _, _) => (Branch(e, l, avl_rt), false)
+            case (true, LeftHigher, _) => (Branch(e, l, avl_rt), false)
+            case (true, Balanced, _) => (Branch(e, l, avl_rt), increased)
+            case (true, RightHigher, RightHigher) => {
+              val (r_e, r_l, r_r) =
+                (avl_rt._element, avl_rt._left, avl_rt._right)
+              (Branch(r_e.get,
+                Branch(e, l, r_l),
+                r_r), false)
             }
-          } else {
-            (Branch(e, l, avl_rt), false)
+            case (true, RightHigher, LeftHigher) => {
+              val r_l = avl_rt._left
+              // AVL平衡した右部分木の左部分木
+              val (rl_e, rl_l, rl_r) =
+                (r_l._element, r_l._left, r_l._right)
+              (Branch(rl_e.get,
+                Branch(e, l, rl_l),
+                Branch(avl_rt._element.get, rl_r, avl_rt._right)),
+                false)
+            }
+            case (true, RightHigher, Balanced) =>
+              (Branch(e, l, avl_rt), false)
           }
         }
   }
